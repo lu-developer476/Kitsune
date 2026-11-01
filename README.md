@@ -2,14 +2,15 @@
 
 **Kitsune** (también llamado **Kitsu**) es un lenguaje expresivo y amistoso para automatización, scripting e inteligencia artificial aplicada.
 
-## Características de v2.5.1
+## Características de v2.5.2
 
 - Sintaxis propia: `let`, `spell`, `echo`, bloques sin punto y coma obligatorio.
 - Funciones, closures, scopes léxicos, condicionales y bucles `while` / `for`.
+- Literales numéricos enteros, decimales y notación científica (`1.25e-2`).
 - `break` y `continue` locales al bucle actual; `and` y `or` con cortocircuito.
 - Arrays, mapas, acceso por índice y acceso por punto a claves textuales.
 - Builtins de colecciones y tipos: `range`, `len`, `push`, `pop`, `first`, `last`, `join`, `split`, `keys`, `values`, `has`, `type`, `str`.
-- JSON integrado: `json_parse(text)` y `json_stringify(value)`; la serialización ordena las claves y rechaza claves no textuales, valores no compatibles, números no finitos y entradas JSON ambiguas o no estándar.
+- JSON integrado: `json_parse(text)` y `json_stringify(value)`; salida compacta y ordenada, Unicode preservado, rechazo de claves no textuales, duplicadas, valores no compatibles, números no finitos y entradas no estándar.
 - Imports `import "lib/math.kit" as math`, con caché, scopes aislados y protección contra rutas externas y ciclos.
 - CLI `kitsune` y alias `kitsu`; formateador oficial con modo `--check`.
 - Errores de léxico/sintaxis con ubicación y errores de ejecución normalizados.
@@ -36,7 +37,7 @@ spell greet(name) {
   echo "Hello, " + name
 }
 
-let payload = json_parse("{\"name\":\"Kitsu\",\"active\":true}")
+let payload = json_parse("{\\"name\\":\\"Kitsu\\",\\"active\\":true}")
 echo payload.name
 echo json_stringify(payload)
 ```
