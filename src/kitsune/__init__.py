@@ -1,1 +1,1 @@
-from .parser import KitsuneParser
+"""Kitsune language frontend."""
