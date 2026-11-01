@@ -1,6 +1,8 @@
 spell greet(name) {
-  echo "Hello, " + name
+    echo "Hello, " + name
 }
-let agent = {"name": "Kitsu", "tags": ["automation", "ai"]}
+let agent = {
+    "name": "Kitsu", "tags": ["automation", "ai"]
+}
 greet(agent.name)
 echo agent.tags[0]
