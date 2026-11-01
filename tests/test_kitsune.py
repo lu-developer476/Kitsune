@@ -93,3 +93,49 @@ def test_csv_stringify_rejects_non_map_rows():
 
     with pytest.raises(RuntimeLangError, match="every row to be a map"):
         run('echo csv_stringify([1])')
+
+
+def test_csv_transformations_filter_select_and_sort():
+    output = []
+    run(
+        'let rows = csv_parse("name,score\\nZoe,8\\nAna,10\\nBeto,10") '
+        'let selected = csv_select(csv_sort(csv_filter(rows, "score", 10), "name"), ["name"]) '
+        'echo json_stringify(selected)',
+        output.append,
+    )
+    assert output == ['[{"name":"Ana"},{"name":"Beto"}]']
+
+
+def test_csv_file_batch_read_and_write(tmp_path):
+    from src.common.errors import RuntimeLangError
+    import pytest
+
+    source = tmp_path / "main.kit"
+    (tmp_path / "one.csv").write_text("id,name\\n1,Ana\\n", encoding="utf-8")
+    (tmp_path / "two.csv").write_text("name,id\\nBeto,2\\n", encoding="utf-8")
+    source.write_text(
+        'let rows = csv_read_many(["one.csv", "two.csv"]) '
+        'csv_write("combined.csv", csv_sort(rows, "id")) '
+        'echo json_stringify(csv_read("combined.csv"))',
+        encoding="utf-8",
+    )
+    output = []
+    run(source.read_text(encoding="utf-8"), output.append, source_path=source)
+    assert output == ['[{"id":"1","name":"Ana"},{"id":"2","name":"Beto"}]']
+    assert (tmp_path / "combined.csv").read_text(encoding="utf-8") == (
+        "id,name\\n1,Ana\\n2,Beto\\n"
+    )
+
+    (tmp_path / "other.csv").write_text("different,columns\\nx,y\\n", encoding="utf-8")
+    with pytest.raises(RuntimeLangError, match="matching columns"):
+        run('echo csv_read_many(["one.csv", "other.csv"])', output.append, source_path=source)
+
+
+def test_csv_transformations_reject_unknown_and_duplicate_columns():
+    import pytest
+    from src.common.errors import RuntimeLangError
+
+    with pytest.raises(RuntimeLangError, match="does not exist"):
+        run('echo csv_filter(csv_parse("name\\nAna"), "age", "20")')
+    with pytest.raises(RuntimeLangError, match="unique"):
+        run('echo csv_select(csv_parse("name\\nAna"), ["name", "name"])')
