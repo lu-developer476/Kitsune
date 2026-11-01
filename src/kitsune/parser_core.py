@@ -1,4 +1,5 @@
 from src.common import ast
+from src.common.errors import ParseError
 from src.common.parser_base import ParserBase
 from src.common.pratt import ExpressionParserMixin
 
@@ -40,5 +41,5 @@ class KitsuneParser(ExpressionParserMixin, ParserBase):
             value=self.expression()
             if isinstance(target,ast.Variable): return ast.Assign(target.name,value)
             if isinstance(target,ast.Index): return ast.IndexAssign(target.target,target.index,value)
-            raise RuntimeError('invalid assignment target')
+            raise ParseError('Invalid assignment target', self.peek().line, self.peek().column)
         return ast.ExprStmt(target)

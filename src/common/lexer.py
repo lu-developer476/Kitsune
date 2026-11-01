@@ -8,12 +8,17 @@ class Token:
     line: int
     column: int
 
-KEYWORDS={"let","spell","echo","if","else","while","for","in","return","true","false","nil","and","or","not","value","fn","print","range","break","continue","import","as"}
+COMMON_KEYWORDS = {'if', 'else', 'while', 'for', 'in', 'return', 'true', 'false', 'nil', 'and', 'or', 'not', 'break', 'continue', 'import', 'as'}
+KITSUNE_KEYWORDS = COMMON_KEYWORDS | {'let', 'spell', 'echo'}
+SINGULAR_KEYWORDS = COMMON_KEYWORDS | {'value', 'fn', 'print'}
+KEYWORDS = KITSUNE_KEYWORDS | SINGULAR_KEYWORDS
 TWO={"==","!=","<=",">=","->"}
 ONE=set("+-*/%=<>(){}[],;:.")
 
 class Lexer:
-    def __init__(self, source): self.source,self.i,self.line,self.col=source,0,1,1
+    def __init__(self, source, keywords=None):
+        self.source,self.i,self.line,self.col=source,0,1,1
+        self.keywords = KEYWORDS if keywords is None else keywords
     def peek(self,n=0):
         j=self.i+n; return self.source[j] if j<len(self.source) else "\0"
     def advance(self):
@@ -49,7 +54,7 @@ class Lexer:
     def identifier(self,line,col):
         s=""
         while self.peek().isalnum() or self.peek()=="_": s+=self.advance()
-        return Token(s if s in KEYWORDS else "IDENT",s,line,col)
+        return Token(s if s in self.keywords else "IDENT",s,line,col)
     def string(self,line,col):
         self.advance(); s=""; escapes={"n":"\n","t":"\t",chr(34):chr(34),"\\":"\\"}
         while self.peek() not in chr(34)+"\0":

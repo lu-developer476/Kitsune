@@ -13,3 +13,11 @@ Kitsune (`.kit`) is designed for expressive scripting, automation and applied AI
 - `import "path.kit" as alias` imports a project-local module.
 
 Statements do not require semicolons. Strings use double quotes; comments begin with `#` or `//`.
+
+## Runtime behavior
+
+- `and` and `or` short-circuit and return boolean values.
+- Runtime failures (invalid operations, indexing, and builtin calls) are reported as `RuntimeLangError`, not raw Python exceptions.
+- Lexical and syntax errors carry source line and column information.
+- Only Kitsune declaration words (`let`, `spell`, `echo`) are reserved by this frontend; Singular's `value`, `fn`, and `print` remain available as ordinary Kitsune identifiers.
+- Imported modules resolve relative to their importer, stay inside the project root, use `.kit`, and are cached after a successful load.
