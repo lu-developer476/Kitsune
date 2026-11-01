@@ -67,7 +67,7 @@ def test_file_builtins_require_file_backed_program():
 
 def test_csv_parse_supports_headers_quoted_fields_and_unicode():
     output = []
-    run('echo json_stringify(csv_parse("name,note\\nKitsu,\"hola, mundo\"\\nLuna,\"café 🌙\""))', output.append)
+    run('echo json_stringify(csv_parse("name,note\\nKitsu,\\"hola, mundo\\"\\nLuna,\\"café 🌙\\""))', output.append)
     assert output == ['[{"name":"Kitsu","note":"hola, mundo"},{"name":"Luna","note":"café 🌙"}]']
 
 
