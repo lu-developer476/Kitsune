@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.5.1
+
+- Enforce strict JSON parsing: reject `NaN`, infinities, duplicate object keys, and numeric overflow.
+- Enforce JSON-compatible values on serialization, including text-only object keys.
+- Expand regression coverage for malformed and ambiguous JSON inputs.
+
 ## 2.5.0
 
 - Add built-in JSON parsing and deterministic compact JSON serialization.
