@@ -1,6 +1,6 @@
 import pytest
 
-from src.common.errors import ParseError, RuntimeLangError
+from src.common.errors import LexError, ParseError, RuntimeLangError
 from src.common.lexer import Lexer
 from src.kitsune.runner import run
 
@@ -25,6 +25,6 @@ def test_parser_errors_have_a_language_error_type_and_location():
 
 
 def test_lexer_errors_have_a_language_error_type_and_location():
-    with pytest.raises(Exception) as error:
+    with pytest.raises(LexError) as error:
         Lexer('echo 1\n@').tokens()
     assert getattr(error.value, 'line', None) == 2
