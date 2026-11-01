@@ -1,3 +1,5 @@
+import csv
+import io
 import json
 import math
 from pathlib import Path
@@ -87,6 +89,61 @@ class Builtin:
 
 
 
+def csv_parse_text(source):
+    if not isinstance(source, str):
+        raise TypeError("csv_parse expects text")
+    if source == "":
+        return []
+    rows = list(csv.reader(io.StringIO(source, newline=""), strict=True))
+    if not rows:
+        return []
+    headers = rows[0]
+    if not headers or any(not header for header in headers):
+        raise ValueError("CSV header names must be non-empty")
+    if len(set(headers)) != len(headers):
+        raise ValueError("CSV header names must be unique")
+    result = []
+    for line_number, row in enumerate(rows[1:], start=2):
+        if len(row) != len(headers):
+            raise ValueError(
+                f"CSV row {line_number} has {len(row)} fields; expected {len(headers)}"
+            )
+        result.append(dict(zip(headers, row)))
+    return result
+
+
+def _csv_cell_text(value):
+    if value is None:
+        return ""
+    if isinstance(value, bool):
+        return str(value).lower()
+    if isinstance(value, (str, int)):
+        return str(value)
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise ValueError("CSV values must not contain non-finite numbers")
+        return str(value)
+    raise TypeError(f"CSV cell value of type {type(value).__name__} is not supported")
+
+
+def csv_stringify_rows(rows):
+    if not isinstance(rows, list):
+        raise TypeError("csv_stringify expects an array of maps")
+    if not rows:
+        return ""
+    if any(not isinstance(row, dict) for row in rows):
+        raise TypeError("csv_stringify expects every row to be a map")
+    headers = sorted({key for row in rows for key in row})
+    if not headers or any(not isinstance(key, str) or not key for key in headers):
+        raise ValueError("CSV column names must be non-empty text")
+    output = io.StringIO(newline="")
+    writer = csv.DictWriter(output, fieldnames=headers, lineterminator="\\n")
+    writer.writeheader()
+    for row in rows:
+        writer.writerow({key: _csv_cell_text(row.get(key)) for key in headers})
+    return output.getvalue()
+
+
 def _reject_json_constant(value):
     raise ValueError(f"invalid JSON numeric constant: {value}")
 
@@ -172,6 +229,8 @@ class Interpreter:
             "str": Builtin("str", self.stringify, 1),
             "json_parse": Builtin("json_parse", json_parse_strict, 1),
             "json_stringify": Builtin("json_stringify", json_stringify_strict, 1),
+            "csv_parse": Builtin("csv_parse", csv_parse_text, 1),
+            "csv_stringify": Builtin("csv_stringify", csv_stringify_rows, 1),
             "read_text": Builtin("read_text", self.read_text, 1),
             "write_text": Builtin("write_text", self.write_text, 2),
         }
