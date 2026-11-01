@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.6.0
+
+- Add UTF-8 `read_text` and `write_text` built-ins for project-local automation.
+- Reject absolute paths, project-root escapes, and symlink escapes; require a file-backed program.
+- Add regression tests for normal file operations and path confinement.
+
 ## 2.5.2
 
 - Add decimal and scientific-notation numeric literals.
