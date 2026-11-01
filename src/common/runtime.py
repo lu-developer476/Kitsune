@@ -137,7 +137,7 @@ def csv_stringify_rows(rows):
     if not headers or any(not isinstance(key, str) or not key for key in headers):
         raise ValueError("CSV column names must be non-empty text")
     output = io.StringIO(newline="")
-    writer = csv.DictWriter(output, fieldnames=headers, lineterminator="\\n")
+    writer = csv.DictWriter(output, fieldnames=headers, lineterminator="\n")
     writer.writeheader()
     for row in rows:
         writer.writerow({key: _csv_cell_text(row.get(key)) for key in headers})
