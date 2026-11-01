@@ -58,7 +58,8 @@ def _scan(source):
             tokens.append(("OP", pair))
             i += 2
             continue
-        tokens.append(("PUNCT", char))
+        kind = "OP" if char in "+-*/%=<>" else "PUNCT"
+        tokens.append((kind, char))
         i += 1
     return tokens
 
