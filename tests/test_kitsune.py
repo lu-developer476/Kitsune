@@ -111,8 +111,8 @@ def test_csv_file_batch_read_and_write(tmp_path):
     import pytest
 
     source = tmp_path / "main.kit"
-    (tmp_path / "one.csv").write_text("id,name\\n1,Ana\\n", encoding="utf-8")
-    (tmp_path / "two.csv").write_text("name,id\\nBeto,2\\n", encoding="utf-8")
+    (tmp_path / "one.csv").write_text("id,name\n1,Ana\n", encoding="utf-8")
+    (tmp_path / "two.csv").write_text("name,id\nBeto,2\n", encoding="utf-8")
     source.write_text(
         'let rows = csv_read_many(["one.csv", "two.csv"]) '
         'csv_write("combined.csv", csv_sort(rows, "id")) '
@@ -123,10 +123,10 @@ def test_csv_file_batch_read_and_write(tmp_path):
     run(source.read_text(encoding="utf-8"), output.append, source_path=source)
     assert output == ['[{"id":"1","name":"Ana"},{"id":"2","name":"Beto"}]']
     assert (tmp_path / "combined.csv").read_text(encoding="utf-8") == (
-        "id,name\\n1,Ana\\n2,Beto\\n"
+        "id,name\n1,Ana\n2,Beto\n"
     )
 
-    (tmp_path / "other.csv").write_text("different,columns\\nx,y\\n", encoding="utf-8")
+    (tmp_path / "other.csv").write_text("different,columns\nx,y\n", encoding="utf-8")
     with pytest.raises(RuntimeLangError, match="matching columns"):
         run('echo csv_read_many(["one.csv", "other.csv"])', output.append, source_path=source)
 
