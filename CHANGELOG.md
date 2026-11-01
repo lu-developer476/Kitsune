@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.5.2
+
+- Add decimal and scientific-notation numeric literals.
+- Reject incomplete exponents with a source-located lexical error.
+- Add regression tests for fractional values and exponent parsing.
+
 ## 2.5.1
 
 - Enforce strict JSON parsing: reject `NaN`, infinities, duplicate object keys, and numeric overflow.
