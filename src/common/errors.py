@@ -1,0 +1,2 @@
+class RuntimeLangError(Exception):
+    pass
