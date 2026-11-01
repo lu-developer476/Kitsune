@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.9.0
+
+- Add `csv_group_by(rows, column)` to group rows by a text-normalized cell value while preserving encounter order.
+- Add `csv_distinct(rows, columns)` to keep the first row for each unique single or composite key.
+- Validate requested columns and reject duplicate distinct-key columns.
+- Add regression coverage for grouping order, stable distinct selection, composite keys, and invalid inputs.
+
+## 2.8.0
+
+- Add CSV file workflows and row transformations: `csv_read`, `csv_read_many`, `csv_write`, `csv_filter`, `csv_select`, and `csv_sort`.
+- Keep CSV batch schemas consistent and confine file access to the project directory.
+- Add tests for CSV transformation and file workflows.
+
 ## 2.6.0
 
 - Add UTF-8 `read_text` and `write_text` built-ins for project-local automation.
@@ -29,7 +42,6 @@
 - Add the official `kitsune format` formatter and `--check` mode.
 - Preserve comments and string literals while normalizing spacing and indentation.
 - Validate source before formatting and guarantee idempotent output.
-- Add formatter tests and CI formatting checks.
 
 ## 1.8.1
 
@@ -37,7 +49,6 @@
 - Normalize runtime failures as language-level errors.
 - Add source locations to lexical and syntax errors.
 - Implement short-circuit behavior for `and` and `or`.
-- Reject invalid assignment targets consistently.
 - Expand module regression coverage for nested imports, caching, cycles, and path confinement.
 - Run CI on Python 3.11, 3.12, and 3.13.
 
