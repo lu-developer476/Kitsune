@@ -2,17 +2,18 @@
 
 **Kitsune** (también llamado **Kitsu**) es un lenguaje expresivo y amistoso para automatización, scripting e inteligencia artificial aplicada.
 
-Esta es la implementación independiente de Kitsune, separada del prototipo conjunto `Languages`. La versión inicial conserva el comportamiento de `Languages` v1.8.0 y su sistema de módulos `.kit`; la infraestructura de lexer, AST y runtime se mantiene dentro de este repositorio para permitir evolución y releases independientes.
+Esta es la implementación independiente de Kitsune, separada del prototipo conjunto `Languages`. La línea base fue `v1.8.0`; esta revisión endurece el runtime, los diagnósticos y el aislamiento gramatical.
 
-## Características de v1.8.0
+## Características de v1.8.1
 
 - Sintaxis propia: `let`, `spell`, `echo`, bloques sin punto y coma obligatorio.
 - Funciones, closures, scopes léxicos, condicionales y bucles `while` / `for`.
-- `break` y `continue` locales al bucle actual.
+- `break` y `continue` locales al bucle actual; `and` y `or` con cortocircuito.
 - Arrays, mapas, acceso por índice y acceso por punto a claves textuales.
 - Builtins: `range`, `len`, `push`, `pop`, `first`, `last`, `join`, `split`, `keys`, `values`, `has`, `type`, `str`.
 - Imports `import "lib/math.kit" as math`, con caché, scopes aislados y protección contra rutas externas y ciclos.
 - CLI `kitsune` y alias `kitsu`.
+- Errores de léxico/sintaxis con ubicación y errores de ejecución normalizados.
 
 ## Requisitos e instalación
 
