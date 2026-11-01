@@ -2,14 +2,14 @@
 
 **Kitsune** (también llamado **Kitsu**) es un lenguaje expresivo y amistoso para automatización, scripting e inteligencia artificial aplicada.
 
-## Características de v2.5.0
+## Características de v2.5.1
 
 - Sintaxis propia: `let`, `spell`, `echo`, bloques sin punto y coma obligatorio.
 - Funciones, closures, scopes léxicos, condicionales y bucles `while` / `for`.
 - `break` y `continue` locales al bucle actual; `and` y `or` con cortocircuito.
 - Arrays, mapas, acceso por índice y acceso por punto a claves textuales.
 - Builtins de colecciones y tipos: `range`, `len`, `push`, `pop`, `first`, `last`, `join`, `split`, `keys`, `values`, `has`, `type`, `str`.
-- JSON integrado: `json_parse(text)` y `json_stringify(value)`; la serialización ordena las claves y rechaza valores no JSON.
+- JSON integrado: `json_parse(text)` y `json_stringify(value)`; la serialización ordena las claves y rechaza claves no textuales, valores no compatibles, números no finitos y entradas JSON ambiguas o no estándar.
 - Imports `import "lib/math.kit" as math`, con caché, scopes aislados y protección contra rutas externas y ciclos.
 - CLI `kitsune` y alias `kitsu`; formateador oficial con modo `--check`.
 - Errores de léxico/sintaxis con ubicación y errores de ejecución normalizados.

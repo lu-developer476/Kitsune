@@ -21,7 +21,7 @@ Collection and type helpers include `range`, `len`, `push`, `pop`, `first`, `las
 JSON support is available without an external package:
 
 - `json_parse(text)` parses a JSON string into Kitsune values.
-- `json_stringify(value)` serializes a Kitsune value to compact JSON, sorts object keys for stable output, preserves Unicode, and rejects non-finite numbers or unsupported values.
+- `json_stringify(value)` serializes a Kitsune value to compact JSON, sorts object keys for stable output, preserves Unicode, rejects duplicate object keys and non-standard numeric constants, rejects numbers outside the runtime's finite range, and refuses non-text object keys or unsupported values.
 
 Example:
 
