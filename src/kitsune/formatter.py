@@ -71,6 +71,7 @@ def format_source(source):
     indent = 0
     previous = None
     blank_pending = False
+    newline_count = 0
     statement_words = {"let", "spell", "echo", "if", "while", "for", "return", "break", "continue", "import"}
 
     def flush():
@@ -92,10 +93,14 @@ def format_source(source):
             if line.strip():
                 flush()
                 blank_pending = False
-            elif output and output[-1] != "":
-                blank_pending = True
+                newline_count = 0
+            else:
+                newline_count += 1
+                if newline_count >= 2 and output and output[-1] != "":
+                    blank_pending = True
             previous = ("NEWLINE", value)
             continue
+        newline_count = 0
         if blank_pending and output and output[-1] != "":
             output.append("")
             blank_pending = False
@@ -149,7 +154,7 @@ def format_source(source):
         if kind == "OP":
             line = line.rstrip()
             unary = value == "-" and (
-                previous is None or previous[1] in {"(", "[", "{", ",", ":", "+", "-", "*", "/", "%", "=", "==", "!=", "<", "<=", ">", ">=", "and", "or", "not"}
+                previous is None or previous[0] == "NEWLINE" or previous[1] in {"(", "[", "{", ",", ":", "+", "-", "*", "/", "%", "=", "==", "!=", "<", "<=", ">", ">=", "and", "or", "not", "return", "echo", "print"}
             )
             if unary:
                 add(value)
