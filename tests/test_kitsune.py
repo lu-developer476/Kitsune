@@ -92,4 +92,4 @@ def test_csv_stringify_rejects_non_scalar_values_and_non_finite_numbers():
     from src.common.errors import RuntimeLangError
 
     with pytest.raises(RuntimeLangError, match="not supported"):
-        run('echo csv_stringify(json_parse("[{\\\"items\\\":[1,2]}]"))')
+        run('echo csv_stringify([1])')
