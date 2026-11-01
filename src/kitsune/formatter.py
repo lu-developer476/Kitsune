@@ -89,7 +89,7 @@ def format_source(source):
             line += " "
         line += value
 
-    for kind, value in tokens:
+    for index, (kind, value) in enumerate(tokens):
         if kind == "NEWLINE":
             if line.strip():
                 flush()
@@ -114,7 +114,11 @@ def format_source(source):
             flush()
             indent = max(0, indent - 1)
             add("}")
-            flush()
+            following = tokens[index + 1] if index + 1 < len(tokens) else None
+            attach = following is not None and following[0] == "PUNCT" and following[1] in {";", ",", ")", "]", "."}
+            attach = attach or (following is not None and following[0] == "OP")
+            if not attach:
+                flush()
             previous = (kind, value)
             continue
         if kind == "PUNCT" and value == "{":
