@@ -179,6 +179,41 @@ def csv_sort_rows(rows, column):
     return sorted(rows, key=lambda row: _csv_cell_text(row[column]))
 
 
+def csv_group_by_rows(rows, column):
+    if not isinstance(rows, list) or any(not isinstance(row, dict) for row in rows):
+        raise TypeError("csv_group_by expects an array of maps")
+    if not isinstance(column, str) or not column:
+        raise TypeError("csv_group_by column must be non-empty text")
+    if any(column not in row for row in rows):
+        raise ValueError(f"CSV column does not exist: {column}")
+    groups = {}
+    for row in rows:
+        key = _csv_cell_text(row[column])
+        groups.setdefault(key, []).append(row)
+    return groups
+
+
+def csv_distinct_rows(rows, columns):
+    if not isinstance(rows, list) or any(not isinstance(row, dict) for row in rows):
+        raise TypeError("csv_distinct expects an array of maps")
+    if not isinstance(columns, list) or any(not isinstance(item, str) or not item for item in columns):
+        raise TypeError("csv_distinct columns must be an array of non-empty text values")
+    if len(set(columns)) != len(columns):
+        raise ValueError("csv_distinct columns must be unique")
+    for row in rows:
+        missing = [column for column in columns if column not in row]
+        if missing:
+            raise ValueError(f"CSV column does not exist: {missing[0]}")
+    seen = set()
+    result = []
+    for row in rows:
+        identity = tuple(_csv_cell_text(row[column]) for column in columns)
+        if identity not in seen:
+            seen.add(identity)
+            result.append(row)
+    return result
+
+
 def _reject_json_constant(value):
     raise ValueError(f"invalid JSON numeric constant: {value}")
 
@@ -269,6 +304,8 @@ class Interpreter:
             "csv_filter": Builtin("csv_filter", csv_filter_rows, 3),
             "csv_select": Builtin("csv_select", csv_select_columns, 2),
             "csv_sort": Builtin("csv_sort", csv_sort_rows, 2),
+            "csv_group_by": Builtin("csv_group_by", csv_group_by_rows, 2),
+            "csv_distinct": Builtin("csv_distinct", csv_distinct_rows, 2),
             "csv_read": Builtin("csv_read", self.csv_read, 1),
             "csv_read_many": Builtin("csv_read_many", self.csv_read_many, 1),
             "csv_write": Builtin("csv_write", self.csv_write, 2),
