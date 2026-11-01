@@ -1,5 +1,6 @@
 from . import ast
 from .errors import ParseError
+from .lexer import KEYWORDS
 
 class ExpressionParserMixin:
     PRECEDENCE = {'or': 1, 'and': 2, '==': 3, '!=': 3, '<': 4, '<=': 4, '>': 4, '>=': 4, '+': 5, '-': 5, '*': 6, '/': 6, '%': 6}
@@ -29,7 +30,11 @@ class ExpressionParserMixin:
                 index = self.expression(); self.expect(']')
                 node = ast.Index(node, index)
             elif self.match('.'):
-                node = ast.Index(node, ast.Literal(self.expect('IDENT').value))
+                token = self.peek()
+                if token.kind != 'IDENT' and token.kind not in KEYWORDS:
+                    raise ParseError('Expected property name', token.line, token.column)
+                self.i += 1
+                node = ast.Index(node, ast.Literal(token.value))
             else: return node
     def primary(self):
         token = self.match('NUMBER', 'STRING')
