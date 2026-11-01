@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.9.0
+
+- Add the official `kitsune format` formatter and `--check` mode.
+- Preserve comments and string literals while normalizing spacing and indentation.
+- Validate source before formatting and guarantee idempotent output.
+- Add formatter tests and CI formatting checks.
+
 ## 1.8.1
 
 - Separate Kitsune and Singular reserved-word sets.
