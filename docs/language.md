@@ -46,6 +46,25 @@ echo json_stringify(rows)
 write_text("output.csv", csv_stringify(rows))
 ```
 
+CSV files can also be processed directly and in batches:
+
+```kitsune
+let rows = csv_read_many(["january.csv", "february.csv"])
+let adults = csv_filter(rows, "status", "active")
+let ordered = csv_sort(adults, "last_name")
+let report = csv_select(ordered, ["last_name", "email"])
+csv_write("active-users.csv", report)
+```
+
+- `csv_read(path)` reads and parses one project-local CSV file.
+- `csv_read_many(paths)` combines multiple files in the supplied order; every non-empty file must have the same set of column names.
+- `csv_write(path, rows)` serializes and writes rows using the same project-path restrictions as `write_text`.
+- `csv_filter(rows, column, value)` keeps rows whose cell text matches the supplied scalar value.
+- `csv_select(rows, columns)` creates new maps containing only the requested columns, in the requested order.
+- `csv_sort(rows, column)` returns a stable, lexicographically sorted copy. It does not mutate the input.
+
+All file operations remain confined to the directory containing the running program.
+
 ## Strict JSON support
 
 - `json_parse(text)` parses a JSON string into Kitsune values.
