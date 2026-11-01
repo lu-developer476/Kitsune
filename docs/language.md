@@ -63,6 +63,10 @@ csv_write("active-users.csv", report)
 - `csv_select(rows, columns)` creates new maps containing only the requested columns, in the requested order.
 - `csv_sort(rows, column)` returns a stable, lexicographically sorted copy. It does not mutate the input.
 
+- `csv_group_by(rows, column)` returns a map from each cell's text value to its rows. Group and row encounter order are preserved.
+- `csv_distinct(rows, columns)` keeps the first row for each unique key; multiple columns form a composite key. The input array is not mutated.
+- Both functions reject missing columns and invalid/duplicate column selections. CSV sort remains lexicographic, not numeric.
+
 All file operations remain confined to the directory containing the running program.
 
 ## Strict JSON support
