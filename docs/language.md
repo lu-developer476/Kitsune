@@ -14,6 +14,23 @@ Kitsune (`.kit`) is designed for expressive scripting, automation and applied AI
 
 Statements do not require semicolons. Strings use double quotes; comments begin with `#` or `//`.
 
+## Built-ins
+
+Collection and type helpers include `range`, `len`, `push`, `pop`, `first`, `last`, `join`, `split`, `keys`, `values`, `has`, `type`, and `str`.
+
+JSON support is available without an external package:
+
+- `json_parse(text)` parses a JSON string into Kitsune values.
+- `json_stringify(value)` serializes a Kitsune value to compact JSON, sorts object keys for stable output, preserves Unicode, and rejects non-finite numbers or unsupported values.
+
+Example:
+
+```kitsune
+let data = json_parse("{\"name\":\"Kitsu\",\"enabled\":true}")
+echo data.name
+echo json_stringify(data)
+```
+
 ## Runtime behavior
 
 - `and` and `or` short-circuit and return boolean values.
@@ -24,16 +41,4 @@ Statements do not require semicolons. Strings use double quotes; comments begin 
 
 ## Official formatter
 
-Format a source file in place:
-
-```bash
-kitsune format path/to/program.kit
-```
-
-Check formatting without changing the file (suitable for CI):
-
-```bash
-kitsune format --check path/to/program.kit
-```
-
-The formatter validates the program before writing, preserves comments and string literals, uses four-space indentation, and produces stable, idempotent output.
+Format a source file in place with `kitsune format path/to/program.kit`; use `kitsune format --check path/to/program.kit` to verify formatting without changing the file. The formatter validates source before writing, preserves comments and string literals, uses four-space indentation, and produces stable, idempotent output.

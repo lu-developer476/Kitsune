@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.5.0
+
+- Add built-in JSON parsing and deterministic compact JSON serialization.
+- Sort serialized object keys, preserve Unicode, and reject non-finite JSON numbers.
+- Add regression tests for stable output, round-tripping null, and invalid JSON diagnostics.
+
 ## 1.9.0
 
 - Add the official `kitsune format` formatter and `--check` mode.

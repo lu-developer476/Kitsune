@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from . import ast
@@ -84,6 +85,16 @@ class Builtin:
             raise RuntimeLangError(f"{self.name} failed: {error}") from error
 
 
+def json_stringify(value):
+    return json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    )
+
+
 class Interpreter:
     def __init__(self, printer=print, module_loader=None, module_extension=".kit"):
         self.printer = printer
@@ -109,6 +120,8 @@ class Interpreter:
             "has": Builtin("has", lambda mapping, key: key in mapping, 2),
             "type": Builtin("type", self.type_name, 1),
             "str": Builtin("str", self.stringify, 1),
+            "json_parse": Builtin("json_parse", json.loads, 1),
+            "json_stringify": Builtin("json_stringify", json_stringify, 1),
         }
         for name, function in builtins.items():
             self.global_env.define(name, function)
