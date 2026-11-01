@@ -4,7 +4,7 @@
 
 Esta es la implementación independiente de Kitsune, separada del prototipo conjunto `Languages`. La línea base fue `v1.8.0`; esta revisión endurece el runtime, los diagnósticos y el aislamiento gramatical.
 
-## Características de v1.8.1
+## Características de v1.9.0
 
 - Sintaxis propia: `let`, `spell`, `echo`, bloques sin punto y coma obligatorio.
 - Funciones, closures, scopes léxicos, condicionales y bucles `while` / `for`.
@@ -14,6 +14,7 @@ Esta es la implementación independiente de Kitsune, separada del prototipo conj
 - Imports `import "lib/math.kit" as math`, con caché, scopes aislados y protección contra rutas externas y ciclos.
 - CLI `kitsune` y alias `kitsu`.
 - Errores de léxico/sintaxis con ubicación y errores de ejecución normalizados.
+- Formateador oficial con escritura y modo de verificación (`kitsune format`, `kitsune format --check`).
 
 ## Requisitos e instalación
 
@@ -58,6 +59,8 @@ Los nombres top-level que no empiezan con `_` se exponen en el alias. Cada módu
 
 ```bash
 python -m pytest
+kitsune format examples/hello.kit
+kitsune format --check examples/hello.kit
 ```
 
 GitHub Actions ejecuta la suite en Python 3.11, 3.12 y 3.13. Consulta [`docs/language.md`](docs/language.md) para la referencia del lenguaje.
