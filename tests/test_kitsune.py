@@ -74,7 +74,7 @@ def test_csv_parse_supports_headers_quoted_fields_and_unicode():
 def test_csv_stringify_is_deterministic_and_round_trips():
     output = []
     run('let rows = [{z: 2, name: "Kitsu"}, {name: "Luna", z: 3}] echo csv_stringify(rows)', output.append)
-    assert output == ['name,z\\nKitsu,2\\nLuna,3\\n']
+    assert output == ['name,z\nKitsu,2\nLuna,3\n']
 
 
 def test_csv_parse_rejects_duplicate_headers_and_ragged_rows():
