@@ -63,3 +63,35 @@ def test_file_builtins_require_file_backed_program():
 
     with pytest.raises(RuntimeLangError):
         run('echo read_text("data.txt")')
+
+
+def test_csv_parse_supports_headers_quoted_fields_and_unicode():
+    output = []
+    run('echo json_stringify(csv_parse("name,note\\\\nKitsu,\\\\\"hola\\\\, mundo\\\\\"\\\\nLuna,\\\\\"café 🌙\\\\\""))', output.append)
+    assert output == ['[{"name":"Kitsu","note":"hola, mundo"},{"name":"Luna","note":"café 🌙"}]']
+
+
+def test_csv_stringify_is_deterministic_and_round_trips():
+    output = []
+    run('let rows = [{z: 2, name: "Kitsu"}, {name: "Luna", z: 3}] echo csv_stringify(rows)', output.append)
+    assert output == ['name,z\\nKitsu,2\\nLuna,3\\n']
+
+
+def test_csv_parse_rejects_duplicate_headers_and_ragged_rows():
+    import pytest
+    from src.common.errors import RuntimeLangError
+
+    with pytest.raises(RuntimeLangError, match="unique"):
+        run('echo csv_parse("name,name\\na,b")')
+    with pytest.raises(RuntimeLangError, match="expected"):
+        run('echo csv_parse("name,age\\nKitsu")')
+
+
+def test_csv_stringify_rejects_non_scalar_values_and_non_finite_numbers():
+    import pytest
+    from src.common.errors import RuntimeLangError
+
+    with pytest.raises(RuntimeLangError, match="not supported"):
+        run('echo csv_stringify([{items: [1, 2]}])')
+    with pytest.raises(RuntimeLangError, match="non-finite"):
+        run('echo csv_stringify([{value: 1e308 * 1e308}])')
