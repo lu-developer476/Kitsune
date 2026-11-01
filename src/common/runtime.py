@@ -1,4 +1,5 @@
 import json
+import math
 from pathlib import Path
 
 from . import ast
@@ -99,12 +100,20 @@ def _unique_json_object(pairs):
     return result
 
 
+def _parse_json_float(value):
+    number = float(value)
+    if not math.isfinite(number):
+        raise ValueError(f"JSON number is outside the supported range: {value}")
+    return number
+
+
 def json_parse_strict(source):
     if not isinstance(source, str):
         raise TypeError("json_parse expects text")
     return json.loads(
         source,
         parse_constant=_reject_json_constant,
+        parse_float=_parse_json_float,
         object_pairs_hook=_unique_json_object,
     )
 
