@@ -31,6 +31,21 @@ A malformed exponent (for example, `3e+`) is reported as a lexical error with it
 
 Collection and type helpers include `range`, `len`, `push`, `pop`, `first`, `last`, `join`, `split`, `keys`, `values`, `has`, `type`, and `str`. File automation adds `read_text(path)` and `write_text(path, content)` for UTF-8 text. These require a file-backed program, accept project-relative paths only, and reject absolute paths and paths (including symlinks) that escape the project directory. `write_text` returns the number of characters written.
 
+## CSV data processing
+
+- `csv_parse(text)` reads CSV text and returns an array of maps, using the first row as column names. All parsed cell values are text.
+- `csv_stringify(rows)` writes an array of maps to CSV. Column names are sorted lexicographically for stable output; missing cells and `nil` become empty fields, and booleans use lowercase text.
+- CSV parsing rejects empty or duplicate headers and rows with a different number of fields. Serialization accepts only text, numbers, booleans, and `nil`; nested collections and non-finite numbers are rejected.
+- Output uses UTF-8-compatible Unicode and LF line endings. An empty input array serializes to empty text.
+
+Example:
+
+```kitsune
+let rows = csv_parse(read_text("input.csv"))
+echo json_stringify(rows)
+write_text("output.csv", csv_stringify(rows))
+```
+
 ## Strict JSON support
 
 - `json_parse(text)` parses a JSON string into Kitsune values.
