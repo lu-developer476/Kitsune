@@ -67,7 +67,7 @@ def test_file_builtins_require_file_backed_program():
 
 def test_csv_parse_supports_headers_quoted_fields_and_unicode():
     output = []
-    run('echo json_stringify(csv_parse("name,note\\\\nKitsu,\\\\\"hola\\\\, mundo\\\\\"\\\\nLuna,\\\\\"café 🌙\\\\\""))', output.append)
+    run('echo json_stringify(csv_parse("name,note\\nKitsu,\"hola, mundo\"\\nLuna,\"café 🌙\""))', output.append)
     assert output == ['[{"name":"Kitsu","note":"hola, mundo"},{"name":"Luna","note":"café 🌙"}]']
 
 
@@ -87,9 +87,9 @@ def test_csv_parse_rejects_duplicate_headers_and_ragged_rows():
         run('echo csv_parse("name,age\\nKitsu")')
 
 
-def test_csv_stringify_rejects_non_scalar_values_and_non_finite_numbers():
+def test_csv_stringify_rejects_non_map_rows():
     import pytest
     from src.common.errors import RuntimeLangError
 
-    with pytest.raises(RuntimeLangError, match="not supported"):
+    with pytest.raises(RuntimeLangError, match="every row to be a map"):
         run('echo csv_stringify([1])')
