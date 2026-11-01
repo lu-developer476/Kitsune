@@ -144,6 +144,41 @@ def csv_stringify_rows(rows):
     return output.getvalue()
 
 
+def csv_filter_rows(rows, column, value):
+    if not isinstance(rows, list) or any(not isinstance(row, dict) for row in rows):
+        raise TypeError("csv_filter expects an array of maps")
+    if not isinstance(column, str) or not column:
+        raise TypeError("csv_filter column must be non-empty text")
+    expected = _csv_cell_text(value)
+    if any(column not in row for row in rows):
+        raise ValueError(f"CSV column does not exist: {column}")
+    return [row for row in rows if _csv_cell_text(row[column]) == expected]
+
+
+def csv_select_columns(rows, columns):
+    if not isinstance(rows, list) or any(not isinstance(row, dict) for row in rows):
+        raise TypeError("csv_select expects an array of maps")
+    if not isinstance(columns, list) or any(not isinstance(item, str) or not item for item in columns):
+        raise TypeError("csv_select columns must be an array of non-empty text values")
+    if len(set(columns)) != len(columns):
+        raise ValueError("csv_select columns must be unique")
+    for row in rows:
+        missing = [column for column in columns if column not in row]
+        if missing:
+            raise ValueError(f"CSV column does not exist: {missing[0]}")
+    return [{column: row[column] for column in columns} for row in rows]
+
+
+def csv_sort_rows(rows, column):
+    if not isinstance(rows, list) or any(not isinstance(row, dict) for row in rows):
+        raise TypeError("csv_sort expects an array of maps")
+    if not isinstance(column, str) or not column:
+        raise TypeError("csv_sort column must be non-empty text")
+    if any(column not in row for row in rows):
+        raise ValueError(f"CSV column does not exist: {column}")
+    return sorted(rows, key=lambda row: _csv_cell_text(row[column]))
+
+
 def _reject_json_constant(value):
     raise ValueError(f"invalid JSON numeric constant: {value}")
 
@@ -231,6 +266,12 @@ class Interpreter:
             "json_stringify": Builtin("json_stringify", json_stringify_strict, 1),
             "csv_parse": Builtin("csv_parse", csv_parse_text, 1),
             "csv_stringify": Builtin("csv_stringify", csv_stringify_rows, 1),
+            "csv_filter": Builtin("csv_filter", csv_filter_rows, 3),
+            "csv_select": Builtin("csv_select", csv_select_columns, 2),
+            "csv_sort": Builtin("csv_sort", csv_sort_rows, 2),
+            "csv_read": Builtin("csv_read", self.csv_read, 1),
+            "csv_read_many": Builtin("csv_read_many", self.csv_read_many, 1),
+            "csv_write": Builtin("csv_write", self.csv_write, 2),
             "read_text": Builtin("read_text", self.read_text, 1),
             "write_text": Builtin("write_text", self.write_text, 2),
         }
@@ -300,6 +341,28 @@ class Interpreter:
         except (OSError, UnicodeError) as error:
             raise RuntimeLangError(f"cannot write text file: {error}") from error
         return len(content)
+
+    def csv_read(self, value):
+        return csv_parse_text(self.read_text(value))
+
+    def csv_read_many(self, paths):
+        if not isinstance(paths, list):
+            raise RuntimeLangError("csv_read_many expects an array of paths")
+        combined = []
+        expected_columns = None
+        for path in paths:
+            rows = self.csv_read(path)
+            if rows:
+                columns = set(rows[0])
+                if expected_columns is None:
+                    expected_columns = columns
+                elif columns != expected_columns:
+                    raise RuntimeLangError("CSV files in a batch must have matching columns")
+                combined.extend(rows)
+        return combined
+
+    def csv_write(self, value, rows):
+        return self.write_text(value, csv_stringify_rows(rows))
 
     def import_module(self, statement):
         if not self.loader or not self.path or not self.root:
