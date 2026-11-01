@@ -16,4 +16,14 @@ jobs:
       - run: python -m pip install -e '.[dev]'
       - run: python -m pytest
       - run: kitsune examples/hello.kit
+      - run: kitsu examples/hello.kit
       - run: kitsune format --check examples/hello.kit
+      - name: Build wheel
+        run: python -m pip wheel --no-deps --wheel-dir dist .
+      - name: Install and smoke-test wheel
+        run: |
+          python -m venv "$RUNNER_TEMP/kitsune-wheel-venv"
+          "$RUNNER_TEMP/kitsune-wheel-venv/bin/python" -m pip install --no-deps dist/*.whl
+          "$RUNNER_TEMP/kitsune-wheel-venv/bin/kitsune" examples/hello.kit
+          "$RUNNER_TEMP/kitsune-wheel-venv/bin/kitsu" examples/hello.kit
+          "$RUNNER_TEMP/kitsune-wheel-venv/bin/kitsune" format --check examples/hello.kit
