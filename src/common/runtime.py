@@ -172,6 +172,8 @@ class Interpreter:
             "str": Builtin("str", self.stringify, 1),
             "json_parse": Builtin("json_parse", json_parse_strict, 1),
             "json_stringify": Builtin("json_stringify", json_stringify_strict, 1),
+            "read_text": Builtin("read_text", self.read_text, 1),
+            "write_text": Builtin("write_text", self.write_text, 2),
         }
         for name, function in builtins.items():
             self.global_env.define(name, function)
@@ -200,6 +202,45 @@ class Interpreter:
                 self.stmt(statement)
         finally:
             self.env = previous
+
+    def _project_file(self, value, *, must_exist=False):
+        if not isinstance(value, str) or not value:
+            raise RuntimeLangError("file path must be non-empty text")
+        requested = Path(value)
+        if requested.is_absolute():
+            raise RuntimeLangError("absolute file paths are not allowed")
+        if self.root is None:
+            raise RuntimeLangError("file operations require a file-backed program")
+        try:
+            target = (self.path.parent / requested).resolve(strict=must_exist)
+        except OSError as error:
+            raise RuntimeLangError(f"cannot resolve file path: {error}") from error
+        if not target.is_relative_to(self.root):
+            raise RuntimeLangError("file path escapes the project directory")
+        if target == self.root:
+            raise RuntimeLangError("file path must identify a file")
+        return target
+
+    def read_text(self, value):
+        target = self._project_file(value, must_exist=True)
+        if not target.is_file():
+            raise RuntimeLangError("read_text target is not a file")
+        try:
+            return target.read_text(encoding="utf-8")
+        except (OSError, UnicodeError) as error:
+            raise RuntimeLangError(f"cannot read text file: {error}") from error
+
+    def write_text(self, value, content):
+        if not isinstance(content, str):
+            raise RuntimeLangError("write_text content must be text")
+        target = self._project_file(value)
+        if target.exists() and not target.is_file():
+            raise RuntimeLangError("write_text target is not a file")
+        try:
+            target.write_text(content, encoding="utf-8")
+        except (OSError, UnicodeError) as error:
+            raise RuntimeLangError(f"cannot write text file: {error}") from error
+        return len(content)
 
     def import_module(self, statement):
         if not self.loader or not self.path or not self.root:
