@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from src.common.errors import RuntimeLangError
@@ -18,15 +20,15 @@ def test_json_parse_and_stringify_round_trip():
     assert evaluate('echo json_stringify(json_parse("null"))') == ["null"]
 
 
-@pytest.mark.parametrize("source", ['"NaN"', '"Infinity"', '"-Infinity"'])
-def test_json_parse_rejects_nonstandard_numeric_constants(source):
+@pytest.mark.parametrize("payload", ["NaN", "Infinity", "-Infinity", "1e999", "-1e999"])
+def test_json_parse_rejects_nonstandard_or_unrepresentable_numbers(payload):
     with pytest.raises(RuntimeLangError):
-        run(f"echo json_parse({source})")
+        run(f"echo json_parse({json.dumps(payload)})")
 
 
 def test_json_parse_rejects_duplicate_object_keys():
     with pytest.raises(RuntimeLangError):
-        run('echo json_parse("{\\"x\\":1,\\"x\\":2}")')
+        run(f"echo json_parse({json.dumps('{\"x\":1,\"x\":2}')})")
 
 
 def test_json_stringify_rejects_non_text_object_keys():
@@ -36,4 +38,4 @@ def test_json_stringify_rejects_non_text_object_keys():
 
 def test_json_stringify_rejects_non_finite_numbers():
     with pytest.raises(RuntimeLangError):
-        run('echo json_stringify(1 / 0)')
+        run(f"echo json_stringify(json_parse({json.dumps('1e999')}))")
