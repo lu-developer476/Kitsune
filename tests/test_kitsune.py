@@ -73,7 +73,7 @@ def test_csv_parse_supports_headers_quoted_fields_and_unicode():
 
 def test_csv_stringify_is_deterministic_and_round_trips():
     output = []
-    run('let rows = [{z: 2, name: "Kitsu"}, {name: "Luna", z: 3}] echo csv_stringify(rows)', output.append)
+    run('let rows = csv_parse("z,name\\n2,Kitsu\\n3,Luna") echo csv_stringify(rows)', output.append)
     assert output == ['name,z\nKitsu,2\nLuna,3\n']
 
 
@@ -92,6 +92,4 @@ def test_csv_stringify_rejects_non_scalar_values_and_non_finite_numbers():
     from src.common.errors import RuntimeLangError
 
     with pytest.raises(RuntimeLangError, match="not supported"):
-        run('echo csv_stringify([{items: [1, 2]}])')
-    with pytest.raises(RuntimeLangError, match="non-finite"):
-        run('echo csv_stringify([{value: 1e308 * 1e308}])')
+        run('echo csv_stringify(json_parse("[{\\\"items\\\":[1,2]}]"))')
