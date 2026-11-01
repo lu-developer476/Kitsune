@@ -29,7 +29,7 @@ A malformed exponent (for example, `3e+`) is reported as a lexical error with it
 
 ## Built-ins
 
-Collection and type helpers include `range`, `len`, `push`, `pop`, `first`, `last`, `join`, `split`, `keys`, `values`, `has`, `type`, and `str`.
+Collection and type helpers include `range`, `len`, `push`, `pop`, `first`, `last`, `join`, `split`, `keys`, `values`, `has`, `type`, and `str`. File automation adds `read_text(path)` and `write_text(path, content)` for UTF-8 text. These require a file-backed program, accept project-relative paths only, and reject absolute paths and paths (including symlinks) that escape the project directory. `write_text` returns the number of characters written.
 
 ## Strict JSON support
 
