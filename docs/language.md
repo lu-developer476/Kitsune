@@ -14,19 +14,34 @@ Kitsune (`.kit`) is designed for expressive scripting, automation and applied AI
 
 Statements do not require semicolons. Strings use double quotes; comments begin with `#` or `//`.
 
+## Numeric literals
+
+Kitsune accepts integers, decimal literals, and scientific notation:
+
+```kitsune
+echo 42
+echo 0.125
+echo 1.25e-2
+echo 2e3
+```
+
+A malformed exponent (for example, `3e+`) is reported as a lexical error with its source location.
+
 ## Built-ins
 
 Collection and type helpers include `range`, `len`, `push`, `pop`, `first`, `last`, `join`, `split`, `keys`, `values`, `has`, `type`, and `str`.
 
-JSON support is available without an external package:
+## Strict JSON support
 
 - `json_parse(text)` parses a JSON string into Kitsune values.
-- `json_stringify(value)` serializes a Kitsune value to compact JSON, sorts object keys for stable output, preserves Unicode, rejects duplicate object keys and non-standard numeric constants, rejects numbers outside the runtime's finite range, and refuses non-text object keys or unsupported values.
+- `json_stringify(value)` serializes a Kitsune value to compact JSON, sorts object keys for stable output, and preserves Unicode.
+- Parsing rejects `NaN`, infinities, duplicate object keys, and numbers that overflow the runtime's finite floating-point range.
+- Serialization requires text object keys and JSON-compatible values; non-finite numbers and unsupported runtime values are rejected.
 
 Example:
 
 ```kitsune
-let data = json_parse("{\"name\":\"Kitsu\",\"enabled\":true}")
+let data = json_parse("{\\"name\\":\\"Kitsu\\",\\"enabled\\":true}")
 echo data.name
 echo json_stringify(data)
 ```
