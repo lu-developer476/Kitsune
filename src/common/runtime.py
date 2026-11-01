@@ -85,7 +85,48 @@ class Builtin:
             raise RuntimeLangError(f"{self.name} failed: {error}") from error
 
 
-def json_stringify(value):
+
+def _reject_json_constant(value):
+    raise ValueError(f"invalid JSON numeric constant: {value}")
+
+
+def _unique_json_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate JSON object key: {key}")
+        result[key] = value
+    return result
+
+
+def json_parse_strict(source):
+    if not isinstance(source, str):
+        raise TypeError("json_parse expects text")
+    return json.loads(
+        source,
+        parse_constant=_reject_json_constant,
+        object_pairs_hook=_unique_json_object,
+    )
+
+
+def _validate_json_value(value):
+    if value is None or isinstance(value, (str, bool, int, float)):
+        return
+    if isinstance(value, list):
+        for item in value:
+            _validate_json_value(item)
+        return
+    if isinstance(value, dict):
+        for key, item in value.items():
+            if not isinstance(key, str):
+                raise TypeError("JSON object keys must be text")
+            _validate_json_value(item)
+        return
+    raise TypeError(f"value of type {type(value).__name__} is not JSON-compatible")
+
+
+def json_stringify_strict(value):
+    _validate_json_value(value)
     return json.dumps(
         value,
         ensure_ascii=False,
@@ -120,8 +161,8 @@ class Interpreter:
             "has": Builtin("has", lambda mapping, key: key in mapping, 2),
             "type": Builtin("type", self.type_name, 1),
             "str": Builtin("str", self.stringify, 1),
-            "json_parse": Builtin("json_parse", json.loads, 1),
-            "json_stringify": Builtin("json_stringify", json_stringify, 1),
+            "json_parse": Builtin("json_parse", json_parse_strict, 1),
+            "json_stringify": Builtin("json_stringify", json_stringify_strict, 1),
         }
         for name, function in builtins.items():
             self.global_env.define(name, function)
